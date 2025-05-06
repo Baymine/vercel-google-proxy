@@ -2,8 +2,9 @@
     "version": 2,
     "routes": [
       {
-        "src": "/.*",
-        "dest": "/api/proxy"
+        "src": "/v1beta/models/(.*)",
+        "dest": "/api/proxy.js",
+        "methods": ["GET", "POST"]
       }
     ]
   }

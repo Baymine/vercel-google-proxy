@@ -3,49 +3,42 @@ import axios from 'axios';
 import https from 'https';
 
 const app = express();
-const PORT = 3000;
-
-// 创建自定义 HTTPS Agent（忽略证书验证 + 延长超时）
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
-  keepAlive: true,
-  timeout: 10000 // 10秒超时
-});
-
 app.use(express.json());
 
+// 统一处理所有请求
 app.all('*', async (req, res) => {
   try {
-    const targetUrl = `https://generativelanguage.googleapis.com${req.path}`;
-    const apiKey = process.env.GOOGLE_API_KEY || 'YOUR_KEY_FALLBACK';
+    const fullPath = req.path;
+    const apiKey = process.env.GOOGLE_API_KEY;
+
+    // 打印日志用于调试
+    console.log('Proxying request to:', `https://generativelanguage.googleapis.com${fullPath}`);
 
     const response = await axios({
       method: req.method,
-      url: `${targetUrl}?key=${apiKey}`,
+      url: `https://generativelanguage.googleapis.com${fullPath}?key=${apiKey}`,
       data: req.body,
       headers: {
         'Content-Type': 'application/json',
         ...req.headers,
       },
-      httpsAgent, // 使用自定义 Agent
-      timeout: 8000 // 单独请求超时
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      timeout: 8000
     });
 
     res.status(response.status).json(response.data);
   } catch (error) {
-    console.error('Proxy Error Details:', {
+    console.error('Proxy Error:', {
       message: error.message,
       code: error.code,
-      stack: error.stack
+      response: error.response?.data
     });
     res.status(500).json({
       error: 'Proxy failed',
       details: error.message,
-      code: error.code // 显示错误代码（如 ECONNRESET）
+      statusCode: error.response?.status
     });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Proxy running on http://localhost:${PORT}`);
-});
+export default app;
