@@ -1,16 +1,15 @@
 {
   "name": "vercel-google-proxy",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node api/proxy.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "axios": "^1.9.0",
-    "express": "^5.1.0"
+    "axios": "^1.6.2",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
