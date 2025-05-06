@@ -15,6 +15,7 @@ app.all('*', async (req, res) => {
       method: req.method,
       url: `https://generativelanguage.googleapis.com${targetPath}?key=${apiKey}`,
       data: req.body,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       headers: {
         'Content-Type': 'application/json',
         ...req.headers,
